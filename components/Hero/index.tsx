@@ -1,23 +1,7 @@
-"use client";
 import Image from "next/image";
-import { useState } from "react";
-
-
-import { useRouter } from "next/navigation"; // App Router
+import Link from "next/link";
 
 const Hero = () => {
-  const router = useRouter();
-
-  const handleClick = () => {
-    router.push("/new-client");
-  };
-  
-  const [email, setEmail] = useState("");
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-  };
-
   return (
     <>
       <section className="overflow-hidden pb-20 pt-35 md:pt-40 xl:pb-25 xl:pt-46">
@@ -71,17 +55,14 @@ const Hero = () => {
                 className="absolute bottom-0 left-6.5 z-1"
               />
               <div className="mt-10">
-                <form onSubmit={handleSubmit}>
-                  <div className="flex flex-wrap gap-5">
-                    <button
-                      onClick={handleClick}
-                      aria-label="get started button"
-                      className=" flex rounded-xl bg-black px-12  py-2.5 text-center text-white duration-300 ease-in-out hover:bg-blackho dark:bg-btndark dark:hover:bg-blackho"
-                    >
-                      أبدا معنا
-                    </button>
-                  </div>
-                </form>
+                <Link className="flex flex-wrap gap-5" href="/new-client">
+                  <button
+                    aria-label="get started button"
+                    className=" flex rounded-xl bg-black px-12  py-2.5 text-center text-white duration-300 ease-in-out hover:bg-blackho dark:bg-btndark dark:hover:bg-blackho"
+                  >
+                    أبدا معنا
+                  </button>
+                </Link>
               </div>
             </div>
           </div>
