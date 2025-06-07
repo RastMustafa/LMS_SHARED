@@ -227,6 +227,7 @@ const Signup = () => {
                 </button>
               </div>
 
+
               <div className="mt-12.5 border-t border-stroke py-5 text-center dark:border-strokedark">
                 <p>
                   Already have an account?{" "}
