@@ -11,18 +11,17 @@ interface DashboardLayoutProps {
 }
 
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
-  const { user } = useAuth();
+  const { user, userLoading } = useAuth();
   const router = useRouter();
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   useEffect(() => {
-    if (!user) {
+    if (!userLoading && !user) {
       router.push("/auth/signin");
     }
-  }, [user, router]);
+  }, [user, router, userLoading]);
 
   if (!user) {
     return <p className="p-5">جاري التحقق من المستخدم...</p>;

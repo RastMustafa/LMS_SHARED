@@ -6,13 +6,11 @@ import Lines from "@/components/Lines";
 import ScrollToTop from "@/components/ScrollToTop";
 import { ThemeProvider } from "next-themes";
 import { Inter } from "next/font/google";
-import toast, { Toaster } from "react-hot-toast";
 
 import "../globals.css";
+import ToasterContext from "@/context/ToastContext";
+import { AuthProvider } from "@/context/AuthContext";
 const inter = Inter({ subsets: ["latin"] });
-
-import ToasterContext from "../../context/ToastContext";
-import { AuthProvider } from "../../context/AuthContext";
 
 export default function RootLayout({
   children,

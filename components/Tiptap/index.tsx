@@ -314,12 +314,12 @@ const Tiptap = ({
       {/* Editor */}
       <EditorContent editor={editor} />
       <div dir="ltr">
-        <button
+        {/* <button
           onClick={handleSubmit}
           className="mt-3 rounded  bg-waterloo px-4 py-2 text-white hover:bg-btndark"
         >
           إرسال
-        </button>
+        </button> */}
       </div>
     </div>
   );
