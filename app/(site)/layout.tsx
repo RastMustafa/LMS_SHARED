@@ -11,8 +11,8 @@ import toast, { Toaster } from "react-hot-toast";
 import "../globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
-import ToasterContext from "../context/ToastContext";
-import { AuthProvider } from "../context/AuthContext";
+import ToasterContext from "../../context/ToastContext";
+import { AuthProvider } from "../../context/AuthContext";
 
 export default function RootLayout({
   children,

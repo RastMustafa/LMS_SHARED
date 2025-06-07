@@ -1,6 +1,6 @@
 "use client";
 
-import { useAuth } from "@/app/context/AuthContext";
+import { useAuth } from "@/context/AuthContext";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
