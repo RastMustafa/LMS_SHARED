@@ -8,13 +8,13 @@ import { getStorage } from "firebase/storage";
 // https://firebase.google.com/docs/web/setup#available-libraries
 
 const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_API_KEY,
-  authDomain: process.env.NEXT_PUBLIC_AUTH_DOMAIN,
-  projectId: process.env.NEXT_PUBLIC_PROJECT_ID,
-  storageBucket: process.env.NEXT_PUBLIC_STORAGE_BUCKET,
-  messagingSenderId: process.env.NEXT_PUBLIC_MESSAGING_SENDER_ID,
-  appId: process.env.NEXT_PUBLIC_APP_ID,
-  measurementId: process.env.NEXT_PUBLIC_MEASUREMENT_ID,
+  apiKey: "AIzaSyClDOu1uXhZDh-w3q8nHjKZAoip9wXhV98",
+  authDomain: "eduplatform-6297f.firebaseapp.com",
+  projectId: "eduplatform-6297f",
+  storageBucket: "eduplatform-6297f.firebasestorage.app",
+  messagingSenderId: "625481974161",
+  appId: "1:625481974161:web:fbb5e8fe9978b0a6cd9a30",
+  measurementId: "G-MQF003PX52",
 };
 
 // Initialize Firebase

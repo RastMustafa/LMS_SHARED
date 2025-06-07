@@ -2,7 +2,16 @@
 import Image from "next/image";
 import { useState } from "react";
 
+
+import { useRouter } from "next/navigation"; // App Router
+
 const Hero = () => {
+  const router = useRouter();
+
+  const handleClick = () => {
+    router.push("/new-client");
+  };
+  
   const [email, setEmail] = useState("");
 
   const handleSubmit = (e) => {
@@ -65,6 +74,7 @@ const Hero = () => {
                 <form onSubmit={handleSubmit}>
                   <div className="flex flex-wrap gap-5">
                     <button
+                      onClick={handleClick}
                       aria-label="get started button"
                       className=" flex rounded-xl bg-black px-12  py-2.5 text-center text-white duration-300 ease-in-out hover:bg-blackho dark:bg-btndark dark:hover:bg-blackho"
                     >
