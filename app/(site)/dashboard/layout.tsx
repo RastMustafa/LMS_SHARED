@@ -93,6 +93,16 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                   إنشاء مقالة جديدة
                 </Link>
               </li>
+                {/* ---  هذا هو الرابط الجديد الذي تمت إضافته --- */}
+              <li className="my-2">
+                <Link
+                  href="/dashboard/d-blogs"
+                  className="block rounded px-3 py-2 text-gray-700 hover:bg-gray-200"
+                >
+                  المقالات
+                </Link>
+              </li>
+              {/* ------------------------------------------- */}
             </ul>
           </nav>
         </aside>
@@ -115,3 +125,5 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     </>
   );
 }
+// app/(site)/dashboard/layout.tsx
+

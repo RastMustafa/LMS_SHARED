@@ -1,140 +1,37 @@
+// // app/(site)/dashboard/blog/edit/[id]/page.tsx
+
 // "use client";
 
-// import React, { useState } from "react";
-// import { Input } from "@/components/ui/input";
-// import { Button } from "@/components/ui/button";
-// import { collection, addDoc, Timestamp } from "firebase/firestore";
-// import Tiptap from "@/components/Tiptap";
-// import { useRouter } from "next/navigation";
-// import { db } from "@/firebase";
-
-// const CreateBlogPage = () => {
-//   interface BlogData {
-//     title: string;
-//     createdBy: string;
-//     date: string;
-//     content: string;
-//   }
-
-//   const [blogData, setBlogData] = useState<BlogData>({
-//     title: "",
-//     createdBy: "",
-//     date: new Date().toISOString().split("T")[0],
-//     content: "",
-//   });
-
-//   const [titleErrorMessage, setTitleErrorMessage] = useState("");
-//   const [createdByErrorMessage, setCreatedByErrorMessage] = useState("");
-//   const [loading, setLoading] = useState(false);
-
-//   const router = useRouter();
-
-//   const handleSubmit = async () => {
-//     // التحقق من الحقول المطلوبة
-//     let valid = true;
-
-//     if (!blogData.title.trim()) {
-//       setTitleErrorMessage("يرجى إدخال عنوان المقالة.");
-//       valid = false;
-//     } else {
-//       setTitleErrorMessage("");
-//     }
-
-//     if (!blogData.createdBy.trim()) {
-//       setCreatedByErrorMessage("يرجى إدخال اسم المؤلف.");
-//       valid = false;
-//     } else {
-//       setCreatedByErrorMessage("");
-//     }
-
-//     if (!valid) return;
-
-//     setLoading(true);
-
-//     try {
-//       await addDoc(collection(db, "blogs"), {
-//         title: blogData.title,
-//         createdBy: blogData.createdBy,
-//         content: blogData.content,
-//         date: Timestamp.fromDate(new Date()),
-//       });
-
-//       // router.push("/blogs"); // اختياري: إعادة توجيه بعد الحفظ
-//     } catch (error) {
-//       console.error("Error saving blog:", error);
-//       alert("حدث خطأ أثناء حفظ المقالة.");
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-//   return (
-//     <div className="mx-auto max-w-4xl px-4 py-20 md:px-10">
-//       <h1 className="mb-6 text-center text-3xl font-bold">
-//         ✍️ إنشاء مقالة جديدة
-//       </h1>
-
-//       <div className="space-y-4" dir="rtl">
-//         <div>
-//           <label className="font-medium text-gray-700">عنوان المقالة:</label>
-//           <Input
-//             value={blogData.title}
-//             onChange={(e) =>
-//               setBlogData({ ...blogData, title: e.target.value })
-//             }
-//             placeholder="اكتب عنوان المقالة هنا"
-//           />
-//           {titleErrorMessage && (
-//             <p className="mt-1 text-sm text-red-500">{titleErrorMessage}</p>
-//           )}
-//         </div>
-
-//         <div>
-//           <label className="font-medium text-gray-700">اسم المؤلف:</label>
-//           <Input
-//             value={blogData.createdBy}
-//             onChange={(e) =>
-//               setBlogData({ ...blogData, createdBy: e.target.value })
-//             }
-//             placeholder="اسم الكاتب"
-//           />
-//           {createdByErrorMessage && (
-//             <p className="mt-1 text-sm text-red-500">{createdByErrorMessage}</p>
-//           )}
-//         </div>
-
-//         <div>
-//           <label className="font-medium text-gray-700">المحتوى:</label>
-//           <Tiptap
-//             blogData={blogData}
-//             setBlogData={setBlogData}
-//             setCreatedByErrorMessage={setCreatedByErrorMessage}
-//             setTitleErrorMessage={setTitleErrorMessage}
-//           />
-//         </div>
-
-//         <div className="pt-6 text-left">
-//           <Button onClick={handleSubmit} disabled={loading}>
-//             {loading ? "يتم الحفظ..." : "نشر المقالة"}
-//           </Button>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default CreateBlogPage;
-// "use client";
-
-// import React, { useState } from "react";
+// import React, { useState, useEffect } from "react";
 // import { Input } from "@/components/ui/input";
 // import { Button } from "@/components/ui/button";
 // import { Textarea } from "@/components/ui/textarea";
-// import { collection, addDoc, Timestamp } from "firebase/firestore";
+// import { collection, addDoc, Timestamp, doc, getDoc, updateDoc } from "firebase/firestore";
 // import { db } from "@/firebase";
+// import { useToast } from "@/hooks/use-toast"; // تأكد من مسار useToast
+// import { useRouter } from "next/navigation"; // استيراد useRouter للتوجيه بعد الحفظ
+//  import { Link } from "lucide-react";
+// interface BlogData {
+//   title: string;
+//   content: string;
+//   author: string;
+//   category: string;
+//   metadata: string;
+//   mainImage: string;
+// }
 
-// const CreateBlogPage = () => {
-//   const [blogData, setBlogData] = useState({
+// interface EditBlogPageProps {
+//   params: { id: string }; // هنا id إلزامي لأنه صفحة [id]
+// }
+
+// const EditBlogPage = ({ params }: EditBlogPageProps) => {
+//   const router = useRouter();
+//   const { toast } = useToast();
+
+//   const blogId = params.id; // الحصول على ID المقال من الـ params
+//   // لا يوجد هنا isEditMode لأن هذه الصفحة هي دائماً للتعديل
+
+//   const [blogData, setBlogData] = useState<BlogData>({
 //     title: "",
 //     content: "",
 //     author: "",
@@ -149,12 +46,63 @@
 //     category?: string;
 //     mainImage?: string;
 //     content?: string;
-//     metadata?: string;
 //   }
 
 //   const [errors, setErrors] = useState<Errors>({});
-//   const [loading, setLoading] = useState(false);
-//   const [success, setSuccess] = useState("");
+//   const [loading, setLoading] = useState(true); // تعيينها إلى true لجلب البيانات
+//   const [isSaving, setIsSaving] = useState(false); // لحالة زر الحفظ
+
+//   // جلب بيانات المقال عند تحميل الصفحة
+//   useEffect(() => {
+//     const fetchBlogData = async () => {
+//       if (blogId) { // تأكد أن الـ ID موجود
+//         try {
+//           const docRef = doc(db, "blogs", blogId);
+//           const docSnap = await getDoc(docRef);
+
+//           if (docSnap.exists()) {
+//             const data = docSnap.data();
+//             setBlogData({
+//               title: data.title || "",
+//               content: data.content || "",
+//               author: data.author || "",
+//               category: data.category || "",
+//               metadata: data.metadata || "",
+//               mainImage: data.mainImage || "",
+//             });
+//             setLoading(false);
+//           } else {
+//             console.error("No such document!");
+//             toast({
+//               title: "خطأ",
+//               description: "المقالة المطلوبة غير موجودة.",
+//               variant: "default",
+//             });
+//             router.push("/dashboard/d-blogs"); // التوجيه إلى صفحة لوحة التحكم إذا لم يتم العثور على المقال
+//           }
+//         } catch (error) {
+//           console.error("Error fetching document:", error);
+//           toast({
+//             title: "خطأ في التحميل",
+//             description: "فشل في تحميل بيانات المقالة.",
+//             variant: "default",
+//           });
+//           setLoading(false);
+//         }
+//       } else {
+//         // هذا السيناريو يجب ألا يحدث في صفحة [id] ولكن للتأكد
+//         setLoading(false);
+//         toast({
+//           title: "خطأ",
+//           description: "معرّف المقالة مفقود.",
+//           variant: "default",
+//         });
+//         router.push("/dashboard/d-blogs");
+//       }
+//     };
+
+//     fetchBlogData();
+//   }, [blogId, router, toast]); // إضافة router و toast كـ dependencies
 
 //   const validate = () => {
 //     const newErrors: Errors = {};
@@ -172,34 +120,45 @@
 
 //     if (!validate()) return;
 
-//     setLoading(true);
-//     setSuccess("");
+//     setIsSaving(true);
 //     try {
-//       await addDoc(collection(db, "blogs"), {
+//       const docRef = doc(db, "blogs", blogId); // تحديث المقال الموجود باستخدام ID
+//       await updateDoc(docRef, {
 //         ...blogData,
-//         createdAt: Timestamp.now(),
+//         // لا يتم تحديث createdAt هنا عادةً
 //       });
-//       setSuccess("تمت إضافة المقالة بنجاح 🎉");
-//       setBlogData({
-//         title: "",
-//         content: "",
-//         author: "",
-//         category: "",
-//         metadata: "",
-//         mainImage: "",
+//       toast({
+//         title: "تم التحديث بنجاح",
+//         description: "تم تعديل المقالة بنجاح 🎉",
+//         variant: "default",
 //       });
-//       setErrors({});
+//       router.push("/dashboard/d-blogs"); // التوجيه إلى صفحة لوحة التحكم بعد الحفظ
 //     } catch (error) {
 //       console.error("خطأ في الحفظ:", error);
-//       alert("حدث خطأ أثناء الحفظ");
+//       toast({
+//         title: "خطأ",
+//         description: "حدث خطأ أثناء حفظ التعديلات. يرجى المحاولة مرة أخرى.",
+//         variant: "default",
+//       });
 //     } finally {
-//       setLoading(false);
+//       setIsSaving(false);
 //     }
 //   };
 
+//   // عرض رسالة تحميل عند جلب بيانات المقال
+//   if (loading) {
+//     return (
+//       <div className="flex items-center justify-center min-h-screen">
+//         <p className="text-xl text-gray-500">جاري تحميل بيانات المقالة...</p>
+//       </div>
+//     );
+//   }
+
 //   return (
 //     <div className="max-w-4xl mx-auto p-6" dir="rtl">
-//       <h1 className="text-3xl font-bold mb-6 text-center">✍️ إضافة مقالة جديدة</h1>
+//       <h1 className="text-3xl font-bold mb-6 text-center">
+//         ✍️ تعديل المقالة
+//       </h1>
 
 //       <form onSubmit={handleSubmit} className="space-y-4">
 //         <div>
@@ -293,29 +252,29 @@
 //           {errors.content && <p className="text-red-500 text-sm">{errors.content}</p>}
 //         </div>
 
-//         {success && <p className="text-green-600 text-center">{success}</p>}
-
-//         <Button type="submit" disabled={loading} className="w-full">
-//           {loading ? "جاري الحفظ..." : "نشر المقالة"}
-//         </Button>
+//       <Button type="submit" disabled={isSaving} className="w-full">
+//   {isSaving ? "جاري الحفظ..." : "حفظ التعديلات"}
+// </Button>
 //       </form>
 //     </div>
 //   );
-// };
+// }; 
 
-// export default CreateBlogPage;
+// export default EditBlogPage;
+// app/(site)/dashboard/blog/edit/[id]/page.tsx
+// components/EditBlogForm.tsx
 
+// app/(site)/dashboard/blog/edit/[id]/page.tsx
 
-// app/(site)/blog/create-blog/page.tsx
-// app/(site)/blog/create-blog/page.tsx
+// app/(site)/blog/edit/[id]/page.tsx
 
-"use client";
+"use client"; // <--- يبقى Client Component كما هو
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react"; // <--- تأكد من استيراد React هنا
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { collection, addDoc, Timestamp, serverTimestamp } from "firebase/firestore";
+import { doc, getDoc, updateDoc, Timestamp } from "firebase/firestore";
 import { db, storage } from "@/firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
@@ -332,8 +291,8 @@ import { TextAlign } from '@tiptap/extension-text-align';
 // استيرادات أيقونات Lucide React
 import { Bold, Italic, List, ListOrdered, Image as LucideImage, AlignLeft, AlignRight, AlignCenter, AlignJustify, Link as LucideLink, Unlink } from "lucide-react";
 
-// <--- التعديل هنا: استخدام useToast من shadcn/ui بدلاً من react-hot-toast --->
 import { useToast } from "@/hooks/use-toast";
+import { useRouter } from "next/navigation";
 
 
 interface BlogData {
@@ -345,30 +304,30 @@ interface BlogData {
   mainImage: string;
 }
 
-interface Errors {
-  title?: string;
-  author?: string;
-  category?: string;
-  mainImage?: string;
-  content?: string;
-  metadata?: string;
+interface EditBlogPageProps {
+  params: { id: string };
 }
 
-const CreateBlogPage = () => {
+const EditBlogPage = ({ params }: EditBlogPageProps) => {
+  // <--- التعديل الحاسم هنا: استخدام React.use() لفك الوعد (Promise) الخاص بـ params --->
+  const resolvedParams = React.use(params); // هنا يتم "انتظار" (await) الـ params
+  const blogId = resolvedParams.id;        // الآن يمكنك الوصول إلى id مباشرةً
+  // <------------------------------------------------------------------------------------>
+
+  const router = useRouter();
+  const { toast } = useToast();
+
   const [blogData, setBlogData] = useState<BlogData>({
-    title: "",
-    content: "",
-    author: "",
-    category: "",
-    metadata: "",
-    mainImage: "",
+    title: "", content: "", author: "", category: "", metadata: "", mainImage: "",
   });
 
-  const [errors, setErrors] = useState<Errors>({});
-  const [loading, setLoading] = useState(false); // لحالة زر الإرسال
-  // const [success, setSuccess] = useState(""); // <--- إزالة هذا الـ state لأنه لم يعد ضرورياً مع toast
+  interface Errors {
+    title?: string; author?: string; category?: string; mainImage?: string; content?: string;
+  }
 
-  const { toast } = useToast(); // <--- استدعاء useToast hook
+  const [errors, setErrors] = useState<Errors>({});
+  const [loading, setLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
 
 
   // تهيئة محرر TipTap
@@ -382,89 +341,64 @@ const CreateBlogPage = () => {
       OrderedList.configure({ HTMLAttributes: { class: "list-decimal pl-6" } }),
       ListItem.configure({ HTMLAttributes: { class: "mb-1" } }),
       TiptapImageExtension.configure({
-        inline: false,
-        allowBase64: true,
+        inline: false, allowBase64: true,
         HTMLAttributes: { class: "rounded-md my-4 border-2 mx-auto max-w-full h-auto" },
       }),
       TiptapLinkExtension.configure({
-        openOnClick: false,
-        autolink: true,
+        openOnClick: false, autolink: true,
         HTMLAttributes: { class: "text-blue-500 underline hover:text-blue-700 hover:cursor-pointer" },
       }),
       TextAlign.configure({ types: ["heading", "paragraph", "image"] }),
     ],
-    content: "<p>أدخل محتوى المقالة هنا</p>", // المحتوى الأولي عند إنشاء مقال جديد
+    content: '',
     onUpdate: ({ editor }) => {
       setBlogData(prev => ({ ...prev, content: editor.getHTML() }));
     },
     editorProps: {
       attributes: {
-        class: 'min-h-[250px] p-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 prose max-w-none dark:prose-invert dark:border-strokedark', // Tailwind classes لمنطقة التحرير
+        class: 'min-h-[250px] p-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 prose max-w-none dark:prose-invert dark:border-strokedark',
       },
     },
   });
 
-  // لإدارة حالة عدم تهيئة المحرر بعد
-  if (!editor) {
-    return null;
-  }
-
-  // دالة لإضافة صورة من URL
-  const addImageUrl = () => {
-    const url = window.prompt("أدخل رابط الصورة (URL)");
-    if (url) {
-      editor.chain().focus().setImage({ src: url }).run();
-    }
-  };
-
-  // دالة لإضافة صورة من Firebase Storage
-  const addImageFromFile = async () => {
-    const input = document.createElement("input");
-    input.type = "file";
-    input.accept = "image/*"; // السماح فقط بالصور
-
-    input.onchange = async (event) => {
-      const file = (event.target as HTMLInputElement).files?.[0];
-      if (!file) return;
-
-      // <--- استخدام toast من shadcn/ui هنا أيضاً --->
-      toast({ title: "جاري الرفع", description: "جاري رفع الصورة إلى التخزين...", variant: "default", duration: 999999 }); // توست مؤقت للرفع
-
-      const storageRef = ref(storage, `blogImages/${file.name}`);
-
+  // جلب بيانات المقال عند تحميل الصفحة
+  useEffect(() => {
+    const fetchBlogData = async () => {
+      if (!blogId) {
+        toast({ title: "خطأ", description: "معرّف المقالة مفقود. سيتم توجيهك.", variant: "default", });
+        router.push("/dashboard/d-blogs");
+        return;
+      }
       try {
-        const snapshot = await uploadBytes(storageRef, file); // رفع الملف
-        const imageUrl = await getDownloadURL(snapshot.ref); // الحصول على رابط التحميل
+        const docRef = doc(db, "blogs", blogId);
+        const docSnap = await getDoc(docRef);
 
-        editor.chain().focus().setImage({ src: imageUrl }).run(); // إدخال الصورة في المحرر
-        toast({ title: "نجاح", description: "تم رفع الصورة بنجاح!", variant: "default" }); // رسالة نجاح
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          setBlogData({
+            title: data.title || "", content: data.content || "", author: data.author || "",
+            category: data.category || "", metadata: data.metadata || "", mainImage: data.mainImage || "",
+          });
+          setLoading(false);
+          setTimeout(() => {
+            if (editor && data.content) {
+              editor.commands.setContent(data.content);
+            }
+          }, 100);
+        } else {
+          console.error("No such document!");
+          toast({ title: "خطأ", description: "المقالة المطلوبة غير موجودة. سيتم توجيهك.", variant: "default", });
+          router.push("/dashboard/d-blogs");
+        }
       } catch (error) {
-        console.error("Image upload failed:", error);
-        toast({ title: "خطأ", description: "فشل تحميل الصورة.", variant: "default" }); // رسالة خطأ
+        console.error("Error fetching document:", error);
+        toast({ title: "خطأ في التحميل", description: "فشل في تحميل بيانات المقالة.", variant: "default", });
+        setLoading(false);
       }
     };
-    input.click(); // فتح نافذة اختيار الملفات
-  };
 
-  // دالة لإضافة/تعديل رابط
-  const setLink = () => {
-    const previousUrl = editor.getAttributes('link').href;
-    const url = window.prompt('URL', previousUrl);
-
-    // ألغى المستخدم
-    if (url === null) {
-      return;
-    }
-
-    // رابط فارغ، يتم إزالة الرابط من النص المحدد
-    if (url === '') {
-      editor.chain().focus().extendMarkRange('link').unsetLink().run();
-      return;
-    }
-
-    // تحديث أو تعيين الرابط
-    editor.chain().focus().extendMarkRange('link').setLink({ href: url }).run();
-  };
+    fetchBlogData();
+  }, [blogId, router, toast, editor]); // أبقِ 'editor' هنا لأنك تستخدمه في تعيين المحتوى بعد الجلب
 
 
   const validateForm = () => {
@@ -473,56 +407,92 @@ const CreateBlogPage = () => {
     if (!blogData.author.trim()) newErrors.author = "الرجاء إدخال اسم المؤلف";
     if (!blogData.category.trim()) newErrors.category = "الرجاء اختيار التصنيف";
     if (!blogData.mainImage.trim()) newErrors.mainImage = "الرجاء إدخال رابط الصورة الرئيسية";
-    // التحقق من أن محرر TipTap ليس فارغاً
     if (!editor || editor.isEmpty) newErrors.content = "الرجاء إدخال المحتوى الكامل للمقالة";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!validateForm()) return;
 
-    setLoading(true);
+    setIsSaving(true);
     try {
-      // المحتوى يتم أخذه مباشرة من المحرر
-      const contentToSave = editor.getHTML();
+      const contentToSave = editor ? editor.getHTML() : blogData.content;
+      if (!contentToSave || editor?.isEmpty) {
+          setErrors(prev => ({ ...prev, content: "الرجاء إدخال المحتوى الكامل للمقالة" }));
+          setIsSaving(false);
+          return;
+      }
 
-      await addDoc(collection(db, "blogs"), {
-        ...blogData,
-        content: contentToSave, // حفظ محتوى HTML من المحرر
-        createdAt: serverTimestamp(), // استخدام serverTimestamp
-      });
+      const dataToSave = { ...blogData, content: contentToSave };
 
-      // <--- استخدام toast من shadcn/ui هنا لرسالة النجاح --->
-      toast({ title: "تم النشر بنجاح", description: "تم نشر المقالة بنجاح 🎉", variant: "default" });
+      const docRef = doc(db, "blogs", blogId);
+      await updateDoc(docRef, dataToSave);
+      toast({ title: "تم التحديث بنجاح", description: "تم تعديل المقالة بنجاح 🎉", variant: "default", });
+      // router.push("/dashboard/d-blogs"); // أبقِ هذا معلقاً لتبقى في نفس الصفحة كما طلبت
 
-      // تفريغ النموذج بعد الإضافة
-      setBlogData({
-        title: "",
-        content: "", // مهم: تفريغ content
-        author: "",
-        category: "",
-        metadata: "",
-        mainImage: "",
-      });
-      editor.commands.clearContent(); // مسح محتوى المحرر
-      setErrors({});
     } catch (error) {
       console.error("خطأ في الحفظ:", error);
-      // <--- استخدام toast من shadcn/ui لرسالة الخطأ --->
-      toast({ title: "خطأ", description: "حدث خطأ أثناء الحفظ.", variant: "default" });
+      toast({ title: "خطأ", description: "حدث خطأ أثناء حفظ التعديلات. يرجى المحاولة مرة أخرى.", variant: "default", });
     } finally {
-      setLoading(false);
+      setIsSaving(false);
     }
   };
 
 
+  const addImageUrl = () => {
+    const url = window.prompt("أدخل رابط الصورة (URL)");
+    if (url) { editor.chain().focus().setImage({ src: url }).run(); }
+  };
+
+  const addImageFromFile = async () => {
+    const input = document.createElement("input");
+    input.type = "file"; input.accept = "image/*";
+    input.onchange = async (event) => {
+      const file = (event.target as HTMLInputElement).files?.[0];
+      if (!file) return;
+
+      toast({ title: "جاري الرفع", description: "جاري رفع الصورة إلى التخزين...", variant: "default", duration: 999999 });
+
+      const storageRef = ref(storage, `blogImages/${file.name}`);
+      try {
+        const snapshot = await uploadBytes(storageRef, file);
+        const imageUrl = await getDownloadURL(snapshot.ref);
+
+        editor.chain().focus().setImage({ src: imageUrl }).run();
+        toast({ title: "نجاح", description: "تم رفع الصورة بنجاح!", variant: "default" });
+      } catch (error) {
+        console.error("Image upload failed:", error);
+        toast({ title: "خطأ", description: "فشل تحميل الصورة.", variant: "default" });
+      }
+    };
+    input.click();
+  };
+
+  const setLink = () => {
+    const previousUrl = editor.getAttributes('link').href;
+    const url = window.prompt('URL', previousUrl);
+    if (url === null) return;
+    if (url === '') { editor.chain().focus().extendMarkRange('link').unsetLink().run(); return; }
+    editor.chain().focus().extendMarkRange('link').setLink({ href: url }).run();
+  };
+
+
+  if (!editor || loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <p className="text-xl text-gray-500">جاري تحميل بيانات المقالة...</p>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-4xl mx-auto p-6" dir="rtl">
-      <h1 className="text-3xl font-bold mb-6 text-center">✍️ إضافة مقالة جديدة</h1>
+      <h1 className="text-3xl font-bold mb-6 text-center">
+        ✍️ تعديل المقالة
+      </h1>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
@@ -763,18 +733,18 @@ const CreateBlogPage = () => {
               <AlignJustify />
             </button>
 
-            </div>
-            {/* منطقة تحرير TipTap */}
-            <EditorContent editor={editor} />
-            {errors.content && <p className="text-red-500 text-sm">{errors.content}</p>}
           </div>
+          {/* منطقة تحرير TipTap */}
+          <EditorContent editor={editor} />
+          {errors.content && <p className="text-red-500 text-sm">{errors.content}</p>}
+        </div>
 
-          <Button type="submit" disabled={loading} className="w-full">
-            {loading ? "جاري الحفظ..." : "نشر المقالة"}
-          </Button>
-        </form>
-      </div>
-    );
-  };
+        <Button type="submit" disabled={isSaving} className="w-full">
+          {isSaving ? "جاري الحفظ..." : "حفظ التعديلات"}
+        </Button>
+      </form>
+    </div>
+  );
+};
 
-  export default CreateBlogPage;
+export default EditBlogPage;

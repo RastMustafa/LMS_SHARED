@@ -8,8 +8,10 @@ import { ThemeProvider } from "next-themes";
 import { Inter } from "next/font/google";
 
 import "../globals.css";
-import ToasterContext from "@/context/ToastContext";
+// import ToasterContext from "@/context/ToastContext";
 import { AuthProvider } from "@/context/AuthContext";
+import { Toaster } from "@/components/ui/toaster";
+
 const inter = Inter({ subsets: ["latin"] });
 
 export default function RootLayout({
@@ -20,7 +22,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`dark:bg-black ${inter.className}`}>
-        <ToasterContext />
+        {/* <ToasterContext /> */}
         <AuthProvider>
           <ThemeProvider
             enableSystem={false}
@@ -29,7 +31,11 @@ export default function RootLayout({
           >
             <Lines />
             <Header />
-            {children}
+           
+            
+          {children}
+       
+            <Toaster  />
             <Footer />
             <ScrollToTop />
           </ThemeProvider>

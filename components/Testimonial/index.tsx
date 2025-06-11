@@ -58,6 +58,10 @@ const Testimonial = () => {
                 delay: 2500,
                 disableOnInteraction: false,
               }}
+// <--- أضف هذا السطر لجعل الحركة دائرية ومستمرة --->
+              loop={true}
+              // <--------------------------------------------------->
+
               pagination={{
                 clickable: true,
               }}

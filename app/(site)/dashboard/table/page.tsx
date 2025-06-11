@@ -246,47 +246,64 @@ import {
   getDocs,
   updateDoc,
   deleteDoc,
+  Timestamp, // <--- استيراد Timestamp للتعامل مع التواريخ من Firestore
 } from "firebase/firestore";
+import { useToast } from "@/hooks/use-toast"; // <--- استيراد useToast
 
 type ClientEntry = {
   id: string;
   fullName: string;
   email: string;
-  phone: string;
+  phone: string; // تم تغييرها من phoneNumber إلى phone لتطابق النوع
   visaProgram: string;
   specialization: string;
   subject: string;
   message: string;
-  createdAt: string;
+  createdAt: string; // سنحولها إلى string
 };
 
 export default function TablePage() {
   const [data, setData] = useState<ClientEntry[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState<Partial<ClientEntry>>({});
+  const { toast } = useToast(); // <--- استخدام useToast hook
 
   useEffect(() => {
     const fetchData = async () => {
-      const snapshot = await getDocs(collection(db, "contacts"));
-      const newData: ClientEntry[] = snapshot.docs.map((doc) => {
-        const d = doc.data();
-        return {
-          id: doc.id,
-          fullName: d.fullname,
-          email: d.email,
-          phone: d.phoneNumber,
-          visaProgram: d.visaProgram,
-          specialization: d.specialization,
-          subject: d.subject,
-          message: d.message,
-          createdAt: d.createdAt?.toDate().toLocaleString() ?? "",
-        };
-      });
-      setData(newData);
+      try {
+        const snapshot = await getDocs(collection(db, "contacts"));
+        const newData: ClientEntry[] = snapshot.docs.map((docSnapshot) => {
+          const d = docSnapshot.data();
+          // تحويل Firestore Timestamp إلى string
+          const createdAt = d.createdAt instanceof Timestamp
+            ? d.createdAt.toDate().toLocaleString() // يعطي تنسيق تاريخ ووقت محلي
+            : d.createdAt?.toString() || ""; // إذا لم يكن Timestamp أو كان undefined
+
+          return {
+            id: docSnapshot.id,
+            fullName: d.fullname || "",
+            email: d.email || "",
+            phone: d.phoneNumber || "", // في Firestore هي phoneNumber، لكن النوع هو phone
+            visaProgram: d.visaProgram || "",
+            specialization: d.specialization || "",
+            subject: d.subject || "",
+            message: d.message || "",
+            createdAt: createdAt,
+          };
+        });
+        setData(newData);
+      } catch (error) {
+        console.error("Error fetching client data:", error);
+        toast({
+          title: "Error fetching data",
+          description: "Failed to load client data. Please try again.",
+          variant: "default", // استخدام default بدلاً من destructive
+        });
+      }
     };
 
     fetchData();
-  }, []);
+  }, [toast]); // إضافة toast كـ dependency
 
   const startEditing = (row: ClientEntry) => {
     setEditingId(row.id);
@@ -300,31 +317,73 @@ export default function TablePage() {
 
   const saveEdit = async () => {
     if (!editingId) return;
-    const entryRef = doc(db, "content", editingId);
-    await updateDoc(entryRef, {
-      fullname: editForm.fullName,
-      email: editForm.email,
-      phoneNumber: editForm.phone,
-      visaProgram: editForm.visaProgram,
-      specialization: editForm.specialization,
-      subject: editForm.subject,
-      message: editForm.message,
-    });
+    const entryRef = doc(db, "contacts", editingId);
+    try {
+      await updateDoc(entryRef, {
+        fullname: editForm.fullName,
+        email: editForm.email,
+        phoneNumber: editForm.phone, // تحديث في Firestore باسم phoneNumber
+        visaProgram: editForm.visaProgram,
+        specialization: editForm.specialization,
+        subject: editForm.subject,
+        message: editForm.message,
+      });
 
-    setData((prev) =>
-      prev.map((item) =>
-        item.id === editingId ? { ...item, ...editForm } as ClientEntry : item
-      )
-    );
-
-    cancelEditing();
+      setData((prev) =>
+        prev.map((item) =>
+          item.id === editingId ? { ...item, ...editForm } as ClientEntry : item
+        )
+      );
+      toast({
+        title: "Success",
+        description: "Client data updated successfully.",
+        variant: "default",
+      });
+      cancelEditing();
+    } catch (error) {
+      console.error("Error saving client data:", error);
+      toast({
+        title: "Error",
+        description: "Failed to update client data. Please try again.",
+        variant: "default", // استخدام default بدلاً من destructive
+      });
+    }
   };
 
-  // New delete function
-  const deleteEntry = async (id: string) => {
-    const entryRef = doc(db, "content", id);
-    await deleteDoc(entryRef);
-    setData((prev) => prev.filter((item) => item.id !== id));
+  // دالة الحذف الجديدة مع رسائل Toast
+  const deleteEntry = async (id: string, fullName: string) => { // أضفنا fullName للاستخدام في رسالة الـ toast
+    toast({
+      title: "Confirm Deletion",
+      description: `Are you sure you want to delete client "${fullName}"? This action cannot be undone.`,
+      variant: "default", // استخدام default بدلاً من destructive
+      action: ( // زر التأكيد داخل الـ toast
+        <Button
+          variant="outline"
+          onClick={async () => {
+            try {
+              const entryRef = doc(db, "contacts", id);
+              await deleteDoc(entryRef);
+              setData((prev) => prev.filter((item) => item.id !== id));
+              toast({
+                title: "Deletion Successful",
+                description: `Client "${fullName}" has been deleted.`,
+                variant: "default",
+              });
+            } catch (error) {
+              console.error("Error deleting client entry:", error);
+              toast({
+                title: "Deletion Failed",
+                description: `Failed to delete client "${fullName}". Please try again.`,
+                variant: "default", // استخدام default بدلاً من destructive
+              });
+            }
+          }}
+          className="shrink-0"
+        >
+          Confirm Delete
+        </Button>
+      ),
+    });
   };
 
   const handleChange = (field: keyof ClientEntry, value: string) => {
@@ -428,9 +487,9 @@ export default function TablePage() {
                           Edit
                         </Button>
                         <Button
-                          variant="destructive"
+                          variant="destructive" // <--- حافظنا على اللون الأحمر هنا كما هو في الكود الأصلي
                           size="sm"
-                          onClick={() => deleteEntry(item.id)}
+                          onClick={() => deleteEntry(item.id, item.fullName)} // <--- تمرير fullName
                         >
                           Delete
                         </Button>
@@ -446,4 +505,3 @@ export default function TablePage() {
     </div>
   );
 }
-

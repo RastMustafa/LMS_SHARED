@@ -6,14 +6,26 @@ export type Author = {
   _ref?: number | string;
 };
 
+// export type Blog = {
+//   _id: number;
+//   title: string;
+//   slug?: any;
+//   metadata?: string;
+//   body?: string;
+//   mainImage?: any;
+//   author?: Author;
+//   tags?: string[];
+//   publishedAt?: string;
+// };
+
 export type Blog = {
-  _id: number;
+  id: string; // Firestore ID عادة يكون string
   title: string;
-  slug?: any;
-  metadata?: string;
-  body?: string;
-  mainImage?: any;
-  author?: Author;
-  tags?: string[];
-  publishedAt?: string;
+  metadata: string;
+  content: string;
+  createdAt: string;
+  mainImage: string;
+  author?: string; // "الريمي"
+  category?: string; // "Blog"
 };
+

@@ -17,7 +17,7 @@ export const testimonialData: Testimonial[] = [
     designation: "المؤسس @democompany",
     image: image2,
     content:
-      "الخدمات التي تقدمها هذه الشركة تفوق التوقعات. أوصي بها لكل من يبحث عن الجودة والكفاءة.",
+      " لخدمات التي تقدمها هذه الشركة تفوق التوقعات. أوصي بها لكل من يبحث عن الجودة والكفاءة.الخدمات التي تقدمها هذه الشركة تفوق التوقعات. أوصي بها لكل من يبحث عن الجودة والكفاءة.",
   },
   {
     id: 3,
@@ -46,6 +46,14 @@ export const testimonialData: Testimonial[] = [
   {
     id: 6,
     name: "Layla Youssef",
+    designation: "المؤسس @democompany",
+    image: image2,
+    content:
+      "خدمة العملاء لديهم مميزة للغاية. شعرت بالراحة أثناء التعامل معهم وأشكرهم على مجهودهم الرائع.",
+  },
+   {
+    id: 7,
+    name: "MUHAMMED ELRIMI",
     designation: "المؤسس @democompany",
     image: image2,
     content:
