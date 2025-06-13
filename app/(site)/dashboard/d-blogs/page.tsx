@@ -222,7 +222,7 @@ const BlogDashboardPage = () => {
         <div className="max-w-7xl mx-auto p-6" dir="rtl">
             <div className="flex justify-between items-center mb-6">
                 <h1 className="text-3xl font-bold text-gray-800 dark:text-white">إدارة المقالات</h1>
-                <Link href="/blog/create-blog" passHref>
+                <Link href="/dashboard/create-blog" passHref>
                     <Button asChild>
                         <span>إضافة مقال جديد</span>
                     </Button>

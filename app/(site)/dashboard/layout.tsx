@@ -87,7 +87,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
               </li>
               <li className="my-2">
                 <Link
-                  href="/blog/create-blog"
+                  href="/dashboard/create-blog"
                   className="block rounded px-3 py-2 text-gray-700 hover:bg-gray-200"
                 >
                   إنشاء مقالة جديدة
@@ -100,6 +100,16 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                   className="block rounded px-3 py-2 text-gray-700 hover:bg-gray-200"
                 >
                   المقالات
+                </Link>
+              </li>
+              {/* ------------------------------------------- */}
+                  {/* ---  هذا هو الرابط الجديد الذي تمت إضافته --- */}
+              <li className="my-2">
+                <Link
+                  href="/dashboard/customer-reviews"
+                  className="block rounded px-3 py-2 text-gray-700 hover:bg-gray-200"
+                >
+              آراء العملاء
                 </Link>
               </li>
               {/* ------------------------------------------- */}

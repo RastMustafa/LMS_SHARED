@@ -249,6 +249,8 @@ import {
   Timestamp, // <--- استيراد Timestamp للتعامل مع التواريخ من Firestore
 } from "firebase/firestore";
 import { useToast } from "@/hooks/use-toast"; // <--- استيراد useToast
+import { generateToken } from "@/utils/generateToken";
+import { createToken } from "@/actions/token";
 
 type ClientEntry = {
   id: string;
@@ -275,9 +277,10 @@ export default function TablePage() {
         const newData: ClientEntry[] = snapshot.docs.map((docSnapshot) => {
           const d = docSnapshot.data();
           // تحويل Firestore Timestamp إلى string
-          const createdAt = d.createdAt instanceof Timestamp
-            ? d.createdAt.toDate().toLocaleString() // يعطي تنسيق تاريخ ووقت محلي
-            : d.createdAt?.toString() || ""; // إذا لم يكن Timestamp أو كان undefined
+          const createdAt =
+            d.createdAt instanceof Timestamp
+              ? d.createdAt.toDate().toLocaleString() // يعطي تنسيق تاريخ ووقت محلي
+              : d.createdAt?.toString() || ""; // إذا لم يكن Timestamp أو كان undefined
 
           return {
             id: docSnapshot.id,
@@ -331,8 +334,10 @@ export default function TablePage() {
 
       setData((prev) =>
         prev.map((item) =>
-          item.id === editingId ? { ...item, ...editForm } as ClientEntry : item
-        )
+          item.id === editingId
+            ? ({ ...item, ...editForm } as ClientEntry)
+            : item,
+        ),
       );
       toast({
         title: "Success",
@@ -351,12 +356,14 @@ export default function TablePage() {
   };
 
   // دالة الحذف الجديدة مع رسائل Toast
-  const deleteEntry = async (id: string, fullName: string) => { // أضفنا fullName للاستخدام في رسالة الـ toast
+  const deleteEntry = async (id: string, fullName: string) => {
+    // أضفنا fullName للاستخدام في رسالة الـ toast
     toast({
       title: "Confirm Deletion",
       description: `Are you sure you want to delete client "${fullName}"? This action cannot be undone.`,
       variant: "default", // استخدام default بدلاً من destructive
-      action: ( // زر التأكيد داخل الـ toast
+      // زر التأكيد داخل الـ toast
+      action: (
         <Button
           variant="outline"
           onClick={async () => {
@@ -391,8 +398,10 @@ export default function TablePage() {
   };
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
-      <h1 className="mb-6 text-2xl font-bold text-center">📝 Editable Client Table</h1>
+    <div className="mx-auto max-w-7xl p-6">
+      <h1 className="mb-6 text-center text-2xl font-bold">
+        📝 Editable Client Table
+      </h1>
 
       <div className="overflow-auto rounded-lg border border-gray-200 shadow-sm">
         <Table className="min-w-full text-sm">
@@ -415,49 +424,66 @@ export default function TablePage() {
               const isEditing = editingId === item.id;
 
               return (
-                <TableRow key={item.id} className="even:bg-gray-50 odd:bg-white">
+                <TableRow
+                  key={item.id}
+                  className="odd:bg-white even:bg-gray-50"
+                >
                   {isEditing ? (
                     <>
                       <TableCell>
                         <Input
                           value={editForm.fullName || ""}
-                          onChange={(e) => handleChange("fullName", e.target.value)}
+                          onChange={(e) =>
+                            handleChange("fullName", e.target.value)
+                          }
                         />
                       </TableCell>
                       <TableCell>
                         <Input
                           value={editForm.email || ""}
-                          onChange={(e) => handleChange("email", e.target.value)}
+                          onChange={(e) =>
+                            handleChange("email", e.target.value)
+                          }
                         />
                       </TableCell>
                       <TableCell>
                         <Input
                           value={editForm.phone || ""}
-                          onChange={(e) => handleChange("phone", e.target.value)}
+                          onChange={(e) =>
+                            handleChange("phone", e.target.value)
+                          }
                         />
                       </TableCell>
                       <TableCell>
                         <Input
                           value={editForm.visaProgram || ""}
-                          onChange={(e) => handleChange("visaProgram", e.target.value)}
+                          onChange={(e) =>
+                            handleChange("visaProgram", e.target.value)
+                          }
                         />
                       </TableCell>
                       <TableCell>
                         <Input
                           value={editForm.specialization || ""}
-                          onChange={(e) => handleChange("specialization", e.target.value)}
+                          onChange={(e) =>
+                            handleChange("specialization", e.target.value)
+                          }
                         />
                       </TableCell>
                       <TableCell>
                         <Input
                           value={editForm.subject || ""}
-                          onChange={(e) => handleChange("subject", e.target.value)}
+                          onChange={(e) =>
+                            handleChange("subject", e.target.value)
+                          }
                         />
                       </TableCell>
                       <TableCell>
                         <Input
                           value={editForm.message || ""}
-                          onChange={(e) => handleChange("message", e.target.value)}
+                          onChange={(e) =>
+                            handleChange("message", e.target.value)
+                          }
                         />
                       </TableCell>
                       <TableCell className="text-xs text-gray-500">
@@ -467,7 +493,11 @@ export default function TablePage() {
                         <Button onClick={saveEdit} size="sm">
                           Save
                         </Button>
-                        <Button variant="outline" onClick={cancelEditing} size="sm">
+                        <Button
+                          variant="outline"
+                          onClick={cancelEditing}
+                          size="sm"
+                        >
                           Cancel
                         </Button>
                       </TableCell>
@@ -481,7 +511,9 @@ export default function TablePage() {
                       <TableCell>{item.specialization}</TableCell>
                       <TableCell>{item.subject}</TableCell>
                       <TableCell>{item.message}</TableCell>
-                      <TableCell className="text-xs text-gray-500">{item.createdAt}</TableCell>
+                      <TableCell className="text-xs text-gray-500">
+                        {item.createdAt}
+                      </TableCell>
                       <TableCell className="flex gap-2 py-2">
                         <Button onClick={() => startEditing(item)} size="sm">
                           Edit
@@ -493,6 +525,25 @@ export default function TablePage() {
                         >
                           Delete
                         </Button>
+                        {/* <--- الزر الجديد لإنشاء رابط التقييم (تم تعديل سطر reviewLink) ---> */}
+                        <Button
+                          size="sm"
+                          onClick={async () => {
+                            // <--- التعديل هنا: استخدام backticks (`) بدلاً من علامات الاقتباس (' أو ") --->
+                            const token = await createToken(item.id);
+                            const link = `${process.env.NEXT_PUBLIC_BASE_URL}/review/${token}`;
+                            // <-------------------------------------------------------------------------------->
+                            navigator.clipboard.writeText(link); // نسخ الرابط إلى الحافظة
+                            toast({
+                              title: "تم نسخ الرابط",
+                              description: `رابط التقييم للعميل ${item.fullName} تم نسخه: ${link}`,
+                              variant: "default",
+                            });
+                          }}
+                        >
+                          رابط التقييم
+                        </Button>
+                        {/* <------------------------------------> */}
                       </TableCell>
                     </>
                   )}

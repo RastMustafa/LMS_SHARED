@@ -7,7 +7,7 @@ import ScrollToTop from "@/components/ScrollToTop";
 import { ThemeProvider } from "next-themes";
 import { Inter } from "next/font/google";
 
-import "../globals.css";
+import "./globals.css";
 // import ToasterContext from "@/context/ToastContext";
 import { AuthProvider } from "@/context/AuthContext";
 import { Toaster } from "@/components/ui/toaster";
@@ -31,11 +31,8 @@ export default function RootLayout({
           >
             <Lines />
             <Header />
-           
-            
-          {children}
-       
-            <Toaster  />
+            {children}
+            <Toaster />
             <Footer />
             <ScrollToTop />
           </ThemeProvider>
